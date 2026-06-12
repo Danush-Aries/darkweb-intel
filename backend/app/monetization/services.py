@@ -3,7 +3,7 @@ import paypalrestsdk
 import razorpay
 from typing import Optional, Dict, Any
 from tortoise.transactions import in_transaction
-from app.core.config import settings
+from ..core.config import settings
 from .models import Product, Order, Subscription, Affiliate, Referral, UpsellOffer, PaymentTransaction, OrderStatus, SubscriptionStatus
 
 

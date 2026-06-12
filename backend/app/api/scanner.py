@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import Optional, List, Dict, Any
-from app.services.scanner_service import ScannerService
+from ..services.scanner_service import ScannerService
 
 router = APIRouter()
 

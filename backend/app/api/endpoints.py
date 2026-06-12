@@ -122,7 +122,7 @@ async def generate_leads(request: LeadGenerateRequest):
                 "niche_keywords": lead.niche_keywords,
                 "pain_points": lead.pain_points,
                 "budget_indicator": lead.budget_indicator,
-                "decision_maker": lead.decision_marker,
+                "decision_maker": lead.decision_maker,
                 "created_at": lead.created_at.isoformat() if lead.created_at else None,
                 "updated_at": lead.updated_at.isoformat() if lead.updated_at else None
             })
@@ -256,5 +256,5 @@ async def create_lead_interaction(
     }
 
 # Include scanner router
-# from .scanner import router as scanner_router
-# router.include_router(scanner_router, prefix="/scanner", tags=["scanner"])
+from .scanner import router as scanner_router
+router.include_router(scanner_router, prefix="/scanner", tags=["scanner"])

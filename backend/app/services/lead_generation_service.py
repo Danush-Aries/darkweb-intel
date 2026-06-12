@@ -5,7 +5,7 @@ from typing import List, Dict, Any, Optional
 from urllib.parse import quote_plus, urljoin
 from bs4 import BeautifulSoup
 import random
-from app.models.lead_models import Lead, LeadStatus, LeadSource
+from ..models.lead_models import Lead, LeadStatus, LeadSource
 from tortoise.exceptions import DoesNotExist, IntegrityError
 
 class LeadGenerationService:
@@ -308,7 +308,7 @@ class LeadGenerationService:
         # Niche prospecting
         if niche_markets:
             for niche in niche_markets:
-                niche_raw = await self.prospect_niche_markets(niche, limit=limit_per_source//len(niche_markets))
+                niche_raw = await self.prospect_niche_markets(niche)
                 results["niche_leads"].extend(niche_raw)
         
         # Combine all leads

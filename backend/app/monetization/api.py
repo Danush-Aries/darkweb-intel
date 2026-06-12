@@ -1,13 +1,13 @@
 from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
 from typing import List, Optional
-from app.monetization.models import (
+from .models import (
     Product, Order, Subscription, Affiliate, Referral, UpsellOffer,
     ProductType, OrderStatus, SubscriptionStatus
 )
-from app.monetization.services import (
+from .services import (
     payment_service, subscription_service, affiliate_service
 )
-from pydantic import BaseModel, EmailField
+from pydantic import BaseModel, EmailStr
 from tortoise.exceptions import DoesNotExist
 
 router = APIRouter()
@@ -38,7 +38,7 @@ class ProductResponse(ProductBase):
 
 class OrderBase(BaseModel):
     product_id: int
-    customer_email: EmailField
+    customer_email: EmailStr
     customer_name: Optional[str] = None
 
 class OrderCreate(OrderBase):
@@ -61,7 +61,7 @@ class OrderResponse(OrderBase):
 
 class SubscriptionBase(BaseModel):
     product_id: int
-    customer_email: EmailField
+    customer_email: EmailStr
     customer_name: Optional[str] = None
     trial_days: int = 0
 
@@ -88,7 +88,7 @@ class SubscriptionResponse(SubscriptionBase):
 
 class AffiliateBase(BaseModel):
     name: str
-    email: EmailField
+    email: EmailStr
     commission_rate: float = 10.0
 
 class AffiliateCreate(AffiliateBase):
@@ -106,7 +106,7 @@ class AffiliateResponse(AffiliateBase):
 
 class ReferralBase(BaseModel):
     affiliate_id: int
-    referred_email: EmailField
+    referred_email: EmailStr
     order_id: Optional[int] = None
     subscription_id: Optional[int] = None
 
