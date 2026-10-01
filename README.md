@@ -2,15 +2,15 @@
 
 **Tor spiders + Claude triage + threat-scoring, wrapped in a FastAPI.**
 
-<!-- hero: 1600x600 screenshot of the DarkWeb Intel API response with scored findings -->
-
 ![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?logo=fastapi&logoColor=white)
 ![Claude](https://img.shields.io/badge/Claude-3.5_Sonnet-D97757?logo=anthropic&logoColor=white)
 ![Playwright](https://img.shields.io/badge/JS_render-Playwright-45ba4b)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
 
-A dark-web intelligence platform. Crawls Tor hidden services and Ahmia, scores findings with a weighted threat engine, triages each finding through Claude, and exposes everything through a clean REST API — with a built-in SAST scanner and lead-generation pipeline on top.
+A dark-web intelligence platform. A Scrapy + Playwright spider targets Ahmia and Tor search engines, a regex-weighted engine scores findings, Claude triages each finding, and a FastAPI backend exposes it all — with a SAST scanner service and lead-generation endpoints on top.
+
+> **Status:** work in progress. The spider and scorer are implemented, but the `POST /scan` endpoint currently runs a *simulated* scan (it scores placeholder content per keyword; the Scrapy hand-off is a stub).
 
 ---
 
@@ -25,18 +25,24 @@ Threat intel from the dark web is usually locked behind five-figure enterprise s
 ```bash
 git clone https://github.com/Danush-Aries/darkweb-intel
 cd darkweb-intel
-docker compose up --build
+cp backend/.env.example backend/.env   # add your ANTHROPIC_API_KEY
+docker compose -f docker/docker-compose.yml up --build   # API + Tor proxy
 
-# Or without Docker
+# Or without Docker (needs a Tor SOCKS proxy on :9050)
+cd backend
 pip install -r requirements.txt
-uvicorn backend.main:app --reload
+uvicorn app.main:app --reload
 ```
 
-You need a Tor SOCKS proxy running on `:9050`. Then:
+Then register a keyword and trigger a scan:
 
 ```bash
-curl -X POST http://localhost:8000/scan -d '{"keywords":["yourcompany.com","ceo email"]}'
+curl -X POST 'http://localhost:8000/keywords?keyword=yourcompany.com'
+curl -X POST http://localhost:8000/scan
+curl http://localhost:8000/reports
 ```
+
+Interactive API docs are at `http://localhost:8000/docs`.
 
 ---
 
@@ -63,20 +69,12 @@ keyword list
 +--------------|------------------+
                v
 +-- FastAPI + Tortoise ORM -------+
-|  /scan  /findings  /leads       |
-|  /sast  /payments               |
+|  /keywords /scan /reports       |
+|  /leads  /api/v1/monetization   |
 +---------------------------------+
 ```
 
-Also bundled: SAST scanner (SQLi/hardcoded secrets/unsafe deserialization), a lead-generation pipeline, and Stripe/PayPal/Razorpay integrations for monetized deployments.
-
----
-
-## Screenshots
-
-<!-- screenshot: api-response.png -->
-<!-- screenshot: threat-score-heatmap.png -->
-<!-- screenshot: sast-report.png -->
+Also bundled: a SAST scanner service (`backend/app/services/scanner_service.py`), a lead-generation pipeline (`/leads`), and Stripe/PayPal/Razorpay monetization endpoints. The repo additionally contains a Next.js dashboard (`frontend/`) and a few experimental side projects (`revenueforge-ai/`, `llm-fragility-lab/`, `corruption-platform/`).
 
 ---
 
@@ -86,6 +84,7 @@ Also bundled: SAST scanner (SQLi/hardcoded secrets/unsafe deserialization), a le
 |---|---|
 | API | FastAPI + Tortoise ORM (SQLite/Postgres) |
 | Crawler | Scrapy + Playwright over Tor SOCKS5 |
+| Frontend | Next.js (`frontend/`) |
 | Triage | AsyncAnthropic (Claude 3.5 Sonnet) |
 | Async | asyncio + aiohttp |
 | Payments | Stripe / PayPal / Razorpay |
@@ -108,4 +107,4 @@ Built by [Dhanush](https://github.com/Danush-Aries) — AI engineering + cyberse
 
 ## License
 
-MIT.
+MIT — see [LICENSE](LICENSE).
